@@ -26,8 +26,8 @@ RUN powershell.exe -ExecutionPolicy Bypass -Command \
 '
     $SetupTemplate = 'setup.exe /INSTANCENAME={0} /IACCEPTSQLSERVERLICENSETERMS /QS /CONFIGURATIONFILE=sqlserver.ini; \{1}'
 
-    foreach ($SqlInstance in $Artifact.SqlInstances) {
-        $Result += $SetupTemplate -f $SqlInstance.Name, "`r`n"
+    foreach ($SqlInstance in $Artifact.Instances) {
+        $Result += $SetupTemplate -f $SqlInstance, "`r`n"
     }
 
     Write-Output -InputObject $Result

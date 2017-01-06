@@ -46,14 +46,10 @@ function GetSQLInstances {
     Write-Verbose -Message ('Finished loading the SOFTWARE registry hive from {0}' -f $MountPath)
 
     ### Define empty array to hold SQL instances
-    $SqlInstances = @()
+    $SqlInstances = $(Get-Item "HKLM:\$TempKey\Microsoft\Microsoft SQL Server\Instance Names\SQL").Property
 
-    ### Obtain registry paths for SQL instances
-    $PathList = Get-ChildItem -Path 'HKLM:\$TempKey\Microsoft\Microsoft SQL Server\Instance Names\SQL'
-
-    foreach ($Item in $PathList) {
-        $SqlInstances += $Item.Name
-        Write-Verbose -Message ('Found a new SQL Server instance: {0}' -f $DisplayName)
+    foreach ($SqlInstance in $SqlInstances) {
+        Write-Verbose -Message ('Found a new SQL Server instance: {0}' -f $SqlInstance)
     }
 
     ### Unmount the SOFTWARE registry hive from the mounted image
@@ -77,7 +73,8 @@ $Manifest = '{0}\{1}.json' -f $OutputPath, $ArtifactName
 ### Create a HashTable to store the results (this will get persisted to JSON)
 $ManifestResult = @{
     Name = 'SQLServer'
-    Instances = GetSQLInstances -MountPath $MountPath
+    Instances = @(GetSQLInstances -MountPath $MountPath)
+    Status = 'Present'
 }
 
 ### Write the result to the manifest file
